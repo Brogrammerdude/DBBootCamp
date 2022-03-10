@@ -80,7 +80,8 @@ CREATE TABLE Sales(
     Price DECIMAL(8, 2) NOT NULL,
     DatePurchased DATETIME NOT NULL,
     AmtPurchased INT NOT NULL,
-    TavernID INT NOT NULL
+    TavernID INT NOT NULL,
+	StockAmt INT NOT NULL
 );
 ALTER TABLE
     Sales ADD CONSTRAINT "sales_id_primary" PRIMARY KEY("id");
@@ -381,7 +382,49 @@ UNION ALL
         Classes
 ;
 
-SELECT ClassName,
-FROM Classes JOIN Levels ON
-Classes.ClassName = Levels.LevelName
-AS LevelGrouping
+
+SELECT OwnerName FROM TavernOwners
+JOIN Roles ON Roles.RoleName AND TavernOwners ON RoleID;
+
+SELECT OwnerName FROM TavernOwners
+INNER JOIN Roles ON Roles.RoleName AND Taverns ON TavernLocation
+AND LocationName ON Locations;
+
+select * from guests g 
+left join classes classname and levels on g.id = levels.levelname 
+order by guestname asc;
+
+select top 10 from sales
+join sales as saleslist on sales.price and sales.ServiceName on sales;
+
+select * from gueststatuses 
+join Classes on Classes.GuestName and Guests on GuestStatus = Guest.Class;
+
+SELECT Guests.Guestname as Guest, Class.Classname as Class FROM Guests
+JOIN Level ON Guests.ID = Levels.guests_ID
+JOIN (SELECT Levels.guests_ID, max(Levels.levelsName) as HighestLevel FROM Levels 
+      GROUP BY Levels.guests_ID)
+      as ML ON ML.guests_ID = Guests.ID
+JOIN Classes ON Levels.classes.ID = Class.ID
+GROUP BY Guests.Guestname, Classes.Classname;
+
+IF OBJECT_ID(N'dbo.levelRequest', N'FN') IS NOT NULL
+    DROP FUNCTION dbo.levelRequest;
+GO
+CREATE FUNCTION dbo.levelRequest(@inputLevel int)
+RETURNS varchar(50)
+AS 
+BEGIN 
+    DECLARE @levelGrouping varchar(50);
+    SELECT @levelGrouping =
+    CASE 
+        WHEN @inputLevel >= 1 AND @inputLevel <=5 THEN '1-5'
+        WHEN @inputLevel > 5 AND @inputLevel <=10 THEN '6-10'
+        WHEN @inputLevel > 10 AND @inputLevel <=20 THEN '11-20'
+        WHEN @inputLevel > 20 THEN 'Greater than 20'
+    END
+    FROM Levels
+    RETURN @levelGrouping
+END
+GO
+
