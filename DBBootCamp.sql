@@ -408,6 +408,8 @@ JOIN (SELECT Levels.guests_ID, max(Levels.levelsName) as HighestLevel FROM Level
 JOIN Classes ON Levels.classes.ID = Class.ID
 GROUP BY Guests.Guestname, Classes.Classname;
 
+-- Creating functions
+
 IF OBJECT_ID(N'dbo.levelRequest', N'FN') IS NOT NULL
     DROP FUNCTION dbo.levelRequest;
 GO
@@ -425,6 +427,53 @@ BEGIN
     END
     FROM Levels
     RETURN @levelGrouping
+END
+GO
+
+IF OBJECT_ID(N'dbo.TavernOwnersReport', N'FN') IS NOT NULL
+    DROP FUNCTION dbo.TavernOwnersReport;
+GO
+CREATE FUNCTION dbo.TavernOwnersReport(@inputTavOwners int)
+RETURNS TABLE
+AS 
+RETURN
+(
+	SELECT OwnerName FROM TavernOwners AS OwnersReport
+	JOIN Locations ON Locations.id = TavernLocation.ID
+	JOIN SupplySales ON Taverns.TavernName
+GO
+
+F OBJECT_ID (N'dbo.', N'IF') IS NOT NULL  
+    DROP FUNCTION Sales.getSalesByStore;  
+GO  
+CREATE FUNCTION Sales.getSalesByStore (@storeid int)  
+RETURNS TABLE  
+AS  
+RETURN   
+(  
+    SELECT P.ProductID, P.Name, SUM(SD.LineTotal) AS 'Total'  
+    FROM Production.Product AS P   
+    JOIN Sales.SalesOrderDetail AS SD ON SD.ProductID = P.ProductID  
+    JOIN Sales.SalesOrderHeader AS SH ON SH.SalesOrderID = SD.SalesOrderID  
+    JOIN Sales.Customer AS C ON SH.CustomerID = C.CustomerID  
+    WHERE C.StoreID = @storeid  
+    GROUP BY P.ProductID, P.Name  
+);  
+
+
+
+IF OBJECT_ID(N'dbo.GuestClasses', N'FN') IS NOT NULL
+    DROP FUNCTION dbo.GuestClasses;
+GO
+CREATE FUNCTION dbo.GuestClasses(@inputGuestClass int)
+RETURNS varchar(50)
+AS 
+BEGIN 
+    DECLARE @ varchar(max);
+    SELECT @inputOwnersReport = TavernServices
+    END
+    FROM Levels
+    RETURN @inputOwnersReport
 END
 GO
 
